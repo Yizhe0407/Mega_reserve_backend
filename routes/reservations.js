@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const Reservation = require('../models/Reservation');
-// const nodemailer = require('nodemailer');
-// const { emailConfig, notificationEmail } = require('../config/email');
+const nodemailer = require('nodemailer');
+const { emailConfig } = require('../config/email');
 
 /* GET check time slot availability */
 router.get('/check-availability', async (req, res) => {
@@ -23,49 +23,61 @@ router.get('/check-availability', async (req, res) => {
       res.status(400).json({ success: false, error: errors.join('、') });
     } else {
       res.status(400).json({ success: false, error: error.message });
-  }
+    }
   }
 });
 
 /* POST create a new reservation */
 router.post('/', async (req, res) => {
+  let transporter;
   try {
     const reservation = new Reservation(req.body);
     await reservation.save();
 
-    // // 創建郵件傳輸器
-    // const transporter = nodemailer.createTransport(emailConfig);
+    // 創建郵件傳輸器
+    transporter = nodemailer.createTransport(emailConfig);
 
-    // // 格式化日期和時間
-    // const formattedDate = new Date(reservation.date).toLocaleDateString('zh-TW');
-    // const services = reservation.selectedItems.join('、');
+    // 驗證郵件配置
+    await transporter.verify();
 
-    // // 設置郵件內容
-    // const mailOptions = {
-    //   from: emailConfig.auth.user,
-    //   to: notificationEmail,
-    //   subject: '新預約通知',
-    //   html: `
-    //     <h2>新預約通知</h2>
-    //     <p>預約日期：${formattedDate}</p>
-    //     <p>預約時間：${reservation.selectedTime}</p>
-    //     <p>車牌號碼：${reservation.license}</p>
-    //     <p>聯絡電話：${reservation.phone}</p>
-    //     <p>服務項目：${services}</p>
-    //   `
-    // };
+    // 格式化日期和時間
+    const formattedDate = new Date(reservation.date).toLocaleDateString('zh-TW');
+    const services = reservation.selectedItems.join('、');
 
-    // // 發送郵件
-    // await transporter.sendMail(mailOptions);
+    // 設置郵件內容
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: 'liaoyizhe75@gmail.com',
+      subject: '新預約通知',
+      html: `
+        <h2>新預約通知</h2>
+        <p>預約日期：${formattedDate}</p>
+        <p>預約時間：${reservation.selectedTime}</p>
+        <p>車牌號碼：${reservation.license}</p>
+        <p>聯絡電話：${reservation.phone}</p>
+        <p>服務項目：${services}</p>
+      `
+    };
 
-    res.json({ success: true, reservation });
+    // 發送郵件
+    const info = await transporter.sendMail(mailOptions);
+    console.log('郵件發送成功:', info.messageId);
+
+    res.json({ success: true, reservation, emailSent: true });
   } catch (error) {
+    console.error('錯誤:', error);
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => err.message);
       res.status(400).json({ success: false, error: errors.join('、') });
+    } else if (error.code === 'EAUTH') {
+      res.status(500).json({ success: false, error: '郵件認證失敗，請檢查郵件配置' });
     } else {
-      res.status(400).json({ success: false, error: error.message });
-  }
+      res.status(500).json({ success: false, error: '預約成功但郵件發送失敗，請聯繫管理員' });
+    }
+  } finally {
+    if (transporter) {
+      transporter.close();
+    }
   }
 });
 

@@ -1,12 +1,11 @@
-// require('dotenv').config();
+require('dotenv').config();
 
 module.exports = {
-    // emailConfig: {
-    //     service: 'gmail',
-    //     auth: {
-    //         user: process.env.EMAIL_USER,
-    //         pass: process.env.EMAIL_PASSWORD
-    //     }
-    // },
-    // notificationEmail: 'liaoyizhe75@gmail.com'
+    emailConfig: {
+        service: 'gmail',
+        auth: {
+            user: process.env.Email_User,
+            pass: process.env.Email_Password,
+        }
+    }
 };
