@@ -47,7 +47,7 @@ router.post('/', async (req, res) => {
     // 設置郵件內容
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: 'liaoyizhe75@gmail.com',
+      to: process.env.NOTIFICATION_EMAILS,
       subject: '兆豐汽車保養廠 - 新客戶預約通知',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
