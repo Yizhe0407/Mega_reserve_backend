@@ -101,4 +101,9 @@ router.post('/', async (req, res) => {
   }
 });
 
+/* HEAD API for UptimeRobot health check */
+router.head('/', (req, res) => {
+  res.status(200).end();
+});
+
 module.exports = router;
