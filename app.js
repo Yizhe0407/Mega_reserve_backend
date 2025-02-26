@@ -20,11 +20,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-// Add HEAD request handler for health check
-app.head('/', (req, res) => {
-  res.status(200).end();
-});
-
 app.use('/api/reservations', reservationsRouter);
 
 // catch 404 and forward to error handler
