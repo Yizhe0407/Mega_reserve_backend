@@ -8,19 +8,26 @@ const { emailConfig } = require('../config/email');
 router.get('/check-availability', async (req, res) => {
   try {
     const { date } = req.query;
-    const reservations = await Reservation.find({
-      date: date // 直接使用字符串格式的日期
-    }).select('selectedTime');
-
-    const reservedTimes = reservations.map(r => r.selectedTime);
-    res.json({ success: true, reservedTimes });
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => err.message);
-      res.status(400).json({ success: false, error: errors.join('、') });
-    } else {
-      res.status(400).json({ success: false, error: error.message });
+    if (!date) {
+      return res.status(400).json({ success: false, error: '請提供日期參數' });
     }
+
+    // 查詢指定日期的所有預約
+    const reservations = await Reservation.find({ date });
+
+    // 提取已預約的時間段
+    const reservedTimes = reservations.map(reservation => reservation.selectedTime);
+
+    res.json({
+      success: true,
+      reservedTimes
+    });
+  } catch (error) {
+    console.error('檢查時間段可用性時發生錯誤:', error);
+    res.status(500).json({
+      success: false,
+      error: '檢查時間段可用性時發生錯誤'
+    });
   }
 });
 
