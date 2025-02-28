@@ -31,7 +31,12 @@ router.get('/check-availability', async (req, res) => {
 router.post('/', async (req, res) => {
   let transporter;
   try {
-    const reservation = new Reservation(req.body);
+    // 確保日期正確處理
+    const reservationData = {
+      ...req.body,
+      date: new Date(new Date(req.body.date).setHours(0, 0, 0, 0))
+    };
+    const reservation = new Reservation(reservationData);
     await reservation.save();
 
     // 創建郵件傳輸器
@@ -55,6 +60,7 @@ router.post('/', async (req, res) => {
           
           <div style="background-color: #f9f9f9; padding: 15px; margin: 15px 0; border-radius: 5px;">
             <h3 style="color: #2c3e50; margin-bottom: 15px;">預約詳情</h3>
+            <p style="margin: 8px 0;"><strong>姓名：</strong>${reservation.name}</p>
             <p style="margin: 8px 0;"><strong>預約日期：</strong>${formattedDate}</p>
             <p style="margin: 8px 0;"><strong>預約時間：</strong>${reservation.selectedTime}</p>
             <p style="margin: 8px 0;"><strong>車牌號碼：</strong>${reservation.license}</p>

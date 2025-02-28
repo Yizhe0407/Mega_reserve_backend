@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const reservationSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, '請輸入姓名'],
+        trim: true
+    },
     phone: {
         type: String,
         required: [true, '請輸入電話號碼'],
