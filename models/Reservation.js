@@ -28,6 +28,10 @@ const reservationSchema = new mongoose.Schema({
         type: String,
         required: [true, '請選擇預約時間']
     },
+    needPickup: {
+        type: Boolean,
+        default: false
+    },
     createdAt: {
         type: Date,
         default: Date.now

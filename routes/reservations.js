@@ -68,6 +68,7 @@ router.post('/', async (req, res) => {
             <p style="margin: 8px 0;"><strong>預約時間：</strong>${reservation.selectedTime}</p>
             <p style="margin: 8px 0;"><strong>車牌號碼：</strong>${reservation.license}</p>
             <p style="margin: 8px 0;"><strong>聯絡電話：</strong>${reservation.phone}</p>
+            <p style="margin: 8px 0;"><strong>是否需要到府牽車：</strong>${reservation.needPickup ? '是' : '否'}</p>
           </div>
 
           <div style="background-color: #f9f9f9; padding: 15px; margin: 15px 0; border-radius: 5px;">
