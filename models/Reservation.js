@@ -21,7 +21,7 @@ const reservationSchema = new mongoose.Schema({
         required: [true, '請選擇至少一個服務項目']
     }],
     date: {
-        type: Date,
+        type: String,
         required: [true, '請選擇預約日期']
     },
     selectedTime: {

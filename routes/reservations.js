@@ -9,10 +9,7 @@ router.get('/check-availability', async (req, res) => {
   try {
     const { date } = req.query;
     const reservations = await Reservation.find({
-      date: {
-        $gte: new Date(date).setHours(0, 0, 0),
-        $lt: new Date(date).setHours(23, 59, 59)
-      }
+      date: date // 直接使用字符串格式的日期
     }).select('selectedTime');
 
     const reservedTimes = reservations.map(r => r.selectedTime);
@@ -31,10 +28,9 @@ router.get('/check-availability', async (req, res) => {
 router.post('/', async (req, res) => {
   let transporter;
   try {
-    // 確保日期正確處理
+    // 直接使用前端傳來的日期字符串
     const reservationData = {
-      ...req.body,
-      date: new Date(new Date(req.body.date).setHours(0, 0, 0, 0))
+      ...req.body
     };
     const reservation = new Reservation(reservationData);
     await reservation.save();
@@ -45,8 +41,8 @@ router.post('/', async (req, res) => {
     // 驗證郵件配置
     await transporter.verify();
 
-    // 格式化日期和時間
-    const formattedDate = new Date(reservation.date).toLocaleDateString('zh-TW');
+    // 使用原始日期字符串
+    const formattedDate = reservation.date;
     const services = reservation.selectedItems.join('、');
 
     // 設置郵件內容
